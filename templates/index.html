@@ -7,29 +7,58 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #e0e5ec; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; transition: background 0.3s; }
+        body { font-family: 'Inter', sans-serif; background: #e0e5ec; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; transition: background 0.5s, color 0.5s; }
         
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #002e6e; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #002e6e; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .logo-img { width: 140px; margin-bottom: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: white; object-fit: contain; }
         #login-screen h1 { margin-bottom: 5px; font-size: 2.8rem; letter-spacing: -1px; }
         
+        .auth-toggle { margin-top: 15px; font-size: 0.9rem; color: #93c5fd; cursor: pointer; text-decoration: underline; text-align: center; }
+
         .app-container { width: 100%; max-width: 480px; background: #f8f9fc; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
         
+        /* DESKTOP GLASSMORPHISM & POLISH */
         @media (min-width: 800px) {
-            .app-container { max-width: 1000px; padding-top: 40px; background: transparent; box-shadow: none; display: grid; grid-template-columns: 350px 1fr; gap: 20px; align-items: start; }
-            .header-bg { position: sticky; top: 40px; border-radius: 24px !important; }
+            body.desktop-mode {
+                background: #0f172a;
+                background-image: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 60%);
+                color: #f8fafc;
+            }
+            .app-container {
+                max-width: 1000px; padding-top: 40px; background: transparent; box-shadow: none; display: grid; grid-template-columns: 350px 1fr; gap: 25px; align-items: start;
+            }
+            .header-bg {
+                position: sticky; top: 40px; border-radius: 24px !important;
+                background: rgba(16, 25, 40, 0.6) !important;
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.1) !important;
+            }
             .content { padding: 0 !important; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
             .full-width-card { grid-column: span 2; }
-            .card, .form-section { margin-bottom: 0 !important; height: fit-content; }
+            .card, .form-section { 
+                margin-bottom: 0 !important; height: fit-content;
+                background: rgba(30, 41, 59, 0.4) !important;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.05) !important;
+                color: #f1f5f9;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+            }
+            h3 { color: #f8fafc !important; }
+            .tx-item { border-bottom: 1px solid rgba(255,255,255,0.05) !important; }
+            .tx-left h4 { color: #e2e8f0 !important; }
+            .tx-left p { color: #94a3b8 !important; }
+            .tab { background: rgba(255,255,255,0.05) !important; color: #94a3b8 !important; }
+            .tab.active { background: #10b981 !important; color: white !important; }
+            input, select { background: rgba(15, 23, 42, 0.6) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; }
         }
 
         .header-bg { background: linear-gradient(135deg, #0047b3, #002e6e); color: white; padding: 30px 15px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; text-align: center; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        
-        /* Hamburger Menu Icon */
         .menu-btn { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 0; }
         .header-left { display: flex; align-items: center; gap: 12px; }
-
         .logout-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
         .logout-btn:hover { background: rgba(255,255,255,0.2); }
         .main-balance { font-size: 2.8rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 15px; }
@@ -67,14 +96,14 @@
         .tx-minus { color: #ef4444; }
         .tx-plus { color: #10b981; }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .modal-card { background: white; padding: 25px; border-radius: 24px; width: 100%; max-width: 400px; position: relative; }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #64748b; }
+        .view-more-btn { background: none; border: 1px dashed #94a3b8; color: #64748b; padding: 10px; width: 100%; border-radius: 12px; cursor: pointer; margin-top: 10px; font-weight: 600; }
         
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .modal-card { background: white; padding: 25px; border-radius: 24px; width: 100%; max-width: 400px; position: relative; color: #0f172a;}
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #64748b; }
         #qr-reader { width: 100%; border-radius: 12px; overflow: hidden; border: none !important; }
         #qr-reader video { max-width: 100% !important; border-radius: 12px; }
 
-        /* Profile Modal Specifics */
         .profile-info { text-align: left; background: #f8fafc; padding: 15px; border-radius: 12px; margin: 15px 0; font-size: 0.9rem; color: #334155; }
         .profile-info p { margin: 5px 0; }
         .profile-info strong { color: #0f172a; }
@@ -83,14 +112,19 @@
 <body>
 
 <div id="login-screen">
-    <img src="/static/logo.jpeg" alt="FinPay Logo" class="logo-img" onerror="this.onerror=null; this.src='/static/logo.jpg';">
+    <img src="/static/logo.jpeg" alt="FinPay Logo" class="logo-img" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=FP&background=fff&color=002e6e&size=140';">
     <h1>FinPay</h1>
     <p style="margin-top:-5px; margin-bottom:30px; color:#93c5fd; font-weight: 500; letter-spacing: 2px;">BY VORTEx</p>
-    <div style="width: 100%; max-width: 300px;">
-        <input type="text" id="username" placeholder="Username (admin)" value="admin">
-        <input type="password" id="password" placeholder="Password (password)" value="password">
-        <button class="submit-btn" onclick="login()" style="background:#10b981;">Secure Login</button>
-        <p id="login-error" style="color: #fca5a5; font-size: 0.9rem; text-align: center; display: none;">Invalid credentials</p>
+    
+    <div style="width: 100%; max-width: 300px;" id="auth-form-container">
+        <h3 id="auth-title" style="color: white; text-align: center; margin-bottom: 15px;">Log In</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        
+        <button class="submit-btn" id="auth-action-btn" onclick="executeAuth()" style="background:#10b981;">Secure Login</button>
+        <p id="login-error" style="color: #fca5a5; font-size: 0.9rem; text-align: center; display: none;"></p>
+        
+        <div class="auth-toggle" onclick="toggleAuthMode()" id="auth-toggle-text">New user? Create an account</div>
     </div>
 </div>
 
@@ -99,7 +133,7 @@
         <div class="header-top">
             <div class="header-left">
                 <button class="menu-btn" onclick="openProfileModal()">☰</button>
-                <div class="greeting">Good Afternoon, User</div>
+                <div class="greeting" id="user-greeting">Good Afternoon, User</div>
             </div>
             <button class="logout-btn" onclick="logout()">Log Out</button>
         </div>
@@ -170,7 +204,7 @@
                 <option value="Others">📦 Others</option>
             </select>
 
-            <select id="spend-round-to" style="background-color: #f0fff4; border-color: #10b981; color: #059669; font-weight: 600;">
+            <select id="spend-round-to" style="border-color: #10b981;">
                 <option value="10">🐷 Round-Up (Nearest ₹10)</option>
                 <option value="100">🐷 Max Savings (Nearest ₹100)</option>
             </select>
@@ -180,7 +214,7 @@
 
         <div id="donate-form" class="form-section full-width-card">
             <h3>Make a Donation</h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">Give back to the community directly through FinPay.</p>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 10px;">Give back directly through FinPay.</p>
             <input type="number" id="donate-amount" placeholder="Donation Amount (₹)">
             <select id="donate-charity">
                 <option value="Child Relief Fund">👶 Child Relief Fund</option>
@@ -197,8 +231,8 @@
 
         <div class="card">
             <h3>📈 VORTEx Analytics</h3>
-            <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;" id="ai-offer">Loading AI...</div>
-            <div style="background: #e2e8f0; color: #334155; padding: 12px; border-radius: 12px; font-size: 0.9rem;" id="ml-prediction">Loading ML...</div>
+            <div style="background: rgba(255, 243, 205, 0.9); color: #856404; padding: 12px; border-radius: 12px; font-size: 0.9rem; margin-bottom: 10px; font-weight: 600;" id="ai-offer">Loading AI...</div>
+            <div style="background: rgba(226, 232, 240, 0.9); color: #334155; padding: 12px; border-radius: 12px; font-size: 0.9rem;" id="ml-prediction">Loading ML...</div>
         </div>
 
         <div class="card full-width-card">
@@ -208,6 +242,7 @@
                 <button class="submit-btn" style="margin: 0; background: #e2e8f0; color: #334155; width: auto;" onclick="clearDateFilter()">Clear</button>
             </div>
             <div id="history-container"></div>
+            <button id="view-more-btn" class="view-more-btn" onclick="toggleHistoryView()" style="display:none;">View More</button>
         </div>
 
     </div>
@@ -216,17 +251,17 @@
 <div id="profile-modal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
         <span class="close-btn" onclick="closeProfileModal()">&times;</span>
-        <img src="https://ui-avatars.com/api/?name=Admin+User&background=0047b3&color=fff&size=128" style="border-radius: 50%; width: 80px; margin-bottom: 10px;">
-        <h3 style="margin: 0; justify-content: center; font-size: 1.3rem;">Admin User</h3>
-        <p style="color: #64748b; font-size: 0.9rem; margin-top: 5px;">admin@finpay</p>
+        <img id="profile-avatar" src="https://ui-avatars.com/api/?name=User&background=0047b3&color=fff&size=128" style="border-radius: 50%; width: 80px; margin-bottom: 10px;">
+        <h3 id="profile-name" style="margin: 0; justify-content: center; font-size: 1.3rem;">User</h3>
+        <p id="profile-upi" style="color: #64748b; font-size: 0.9rem; margin-top: 5px;">user@finpay</p>
         
         <div class="profile-info">
             <p><strong>Bank:</strong> FinPay Payments Bank</p>
             <p><strong>A/C No:</strong> 0000 1234 5678</p>
             <p><strong>IFSC:</strong> FINP0000123</p>
         </div>
-        
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=admin@finpay&pn=Admin%20User" alt="Receive QR Code" style="border-radius: 10px; border: 2px solid #e2e8f0; padding: 5px;">
+
+        <img id="profile-qr" src="" alt="Receive QR Code" style="border-radius: 10px; border: 2px solid #e2e8f0; padding: 5px; margin-top: 10px; background: white;">
         <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px;">Scan to receive money</p>
     </div>
 </div>
@@ -236,7 +271,6 @@
         <span class="close-btn" onclick="closeScanner()">&times;</span>
         <h3 style="text-align: center; margin-bottom: 20px;">⛶ Scan to Pay</h3>
         <div id="qr-reader"></div>
-        <p style="text-align: center; font-size: 0.8rem; color: #64748b; margin-top: 15px;">Point camera at any UPI QR Code</p>
     </div>
 </div>
 
@@ -252,33 +286,51 @@
 <script>
     let allTransactions = [];
     let html5QrcodeScanner = null;
+    let isRegisterMode = false;
+    let showingAllHistory = false;
 
-    async function login() {
+    // Toggle between Login and Register modes
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('auth-title').innerText = isRegisterMode ? 'Create Account' : 'Log In';
+        document.getElementById('auth-action-btn').innerText = isRegisterMode ? 'Sign Up' : 'Secure Login';
+        document.getElementById('auth-toggle-text').innerText = isRegisterMode ? 'Already have an account? Log In' : 'New user? Create an account';
+        document.getElementById('login-error').style.display = 'none';
+    }
+
+    async function executeAuth() {
         const u = document.getElementById('username').value;
         const p = document.getElementById('password').value;
-        const res = await fetch('https://vortex-4.onrender.com//api/login', {
+        const endpoint = isRegisterMode ? '/api/register' : '/api/login';
+        
+        const res = await fetch(endpoint, {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ username: u, password: p })
         });
+        const data = await res.json();
+
         if (res.ok) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-container').style.display = ''; 
             
             if (window.innerWidth >= 800) {
-                document.body.style.background = "linear-gradient(135deg, #0f172a, #1e1b4b)";
+                document.body.classList.add('desktop-mode');
             }
             loadState();
         } else {
-            document.getElementById('login-error').style.display = 'block';
+            const errElem = document.getElementById('login-error');
+            errElem.innerText = data.error || 'Authentication failed';
+            errElem.style.display = 'block';
         }
     }
 
-    function logout() {
+    async function logout() {
+        await fetch('/api/logout', { method: 'POST' });
         document.getElementById('password').value = '';
         document.getElementById('login-error').style.display = 'none';
         document.getElementById('app-container').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
-        document.body.style.background = "#e0e5ec"; 
+        document.body.classList.remove('desktop-mode');
     }
 
     function toggleForm(formId) {
@@ -309,7 +361,6 @@
         document.getElementById('upi-id').value = upi;
     }
 
-    // Modal Triggers
     function openProfileModal() { document.getElementById('profile-modal').style.display = 'flex'; }
     function closeProfileModal() { document.getElementById('profile-modal').style.display = 'none'; }
     function openPiggyModal() { document.getElementById('redeem-modal').style.display = 'flex'; }
@@ -320,12 +371,10 @@
         html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     }
-
     function closeScanner() {
         document.getElementById('scanner-modal').style.display = 'none';
         if (html5QrcodeScanner) html5QrcodeScanner.clear();
     }
-
     function onScanSuccess(decodedText) {
         closeScanner();
         let upi = decodedText;
@@ -336,15 +385,24 @@
         }
         toggleForm('spend-form');
         document.getElementById('upi-id').value = upi;
-        alert("✅ QR Scanned! Enter amount to pay.");
     }
-    
     function onScanFailure(error) { }
 
     async function loadState() {
-        const res = await fetch('https://vortex-4.onrender.com//api/state');
+        const res = await fetch('/api/state');
+        if (!res.ok) return logout();
+        
         const data = await res.json();
         
+        // Populate profile info
+        document.getElementById('user-greeting').innerText = `Hello, ${data.username}`;
+        document.getElementById('profile-name').innerText = data.username;
+        document.getElementById('profile-upi').innerText = `${data.username}@finpay`;
+        document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${data.username}&background=0047b3&color=fff&size=128`;
+        
+        // Populate Dynamic QR Code
+        document.getElementById('profile-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${data.username}@finpay&pn=${data.username}`;
+
         document.getElementById('main-balance').innerText = `₹${data.account.main_balance.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         document.getElementById('modal-piggy-bank').innerText = `₹${data.account.piggy_bank.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         document.getElementById('ai-offer').innerText = data.ai_offer;
@@ -354,12 +412,12 @@
         if (m) {
             const pct = Math.min((m.progress / m.target) * 100, 100);
             document.getElementById('milestone-container').innerHTML = `
-                <div style="border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; background: #f8fafc;">
-                    <div style="display: flex; justify-content: space-between; font-weight: 600; color: #0f172a;">
+                <div style="border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05);">
+                    <div style="display: flex; justify-content: space-between; font-weight: 600;">
                         <span>${m.desc}</span>
                         <span>₹${Math.min(m.progress, m.target)} / ₹${m.target}</span>
                     </div>
-                    <div style="background: #e2e8f0; height: 8px; border-radius: 4px; margin-top: 10px;"><div style="background: #f59e0b; height: 100%; border-radius: 4px; width: ${pct}%"></div></div>
+                    <div style="background: rgba(226, 232, 240, 0.2); height: 8px; border-radius: 4px; margin-top: 10px;"><div style="background: #f59e0b; height: 100%; border-radius: 4px; width: ${pct}%"></div></div>
                 </div>`;
         } else {
             document.getElementById('milestone-container').innerHTML = `<p style="color: #10b981; font-weight: bold;">🎉 All current milestones completed!</p>`;
@@ -374,6 +432,11 @@
         renderHistory();
     }
 
+    function toggleHistoryView() {
+        showingAllHistory = !showingAllHistory;
+        renderHistory();
+    }
+
     function renderHistory() {
         const filterDate = document.getElementById('history-date-filter').value; 
         
@@ -382,7 +445,23 @@
             txToShow = allTransactions.filter(t => t.date.startsWith(filterDate));
         }
         
-        const hHtml = txToShow.map(t => {
+        // Toggle view logic
+        const viewBtn = document.getElementById('view-more-btn');
+        let displayedTx = txToShow;
+        
+        if (txToShow.length > 5) {
+            viewBtn.style.display = 'block';
+            if (!showingAllHistory) {
+                displayedTx = txToShow.slice(0, 5);
+                viewBtn.innerText = `View More (${txToShow.length - 5} hidden)`;
+            } else {
+                viewBtn.innerText = 'Show Less';
+            }
+        } else {
+            viewBtn.style.display = 'none';
+        }
+        
+        const hHtml = displayedTx.map(t => {
             let colorClass = 'tx-minus';
             let displayValue = `-₹${t.amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
 
@@ -407,15 +486,13 @@
     async function addMoney() {
         const amount = document.getElementById('add-amount').value;
         const method = document.getElementById('tab-card').classList.contains('active') ? 'Credit/Debit Card' : 'UPI Transfer';
-        
         if (!amount || amount <= 0) return alert("Enter a valid amount");
-        await fetch('https://vortex-4.onrender.com/api/add_money', {
+        await fetch('/api/add_money', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ amount: parseFloat(amount), method: method })
         });
         document.getElementById('add-amount').value = '';
         toggleForm('add-money-form');
-        alert("✅ Funds Added!");
         loadState();
     }
 
@@ -428,17 +505,13 @@
         
         if (!amount || amount <= 0) return alert("Enter a valid amount");
 
-        const res = await fetch('https://vortex-4.onrender.com//api/spend', {
+        const res = await fetch('/api/spend', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                amount: parseFloat(amount), category: category, 
-                upi_id: upiId, receiver_name: receiver, round_to: parseInt(roundTo)
-            })
+            body: JSON.stringify({ amount: parseFloat(amount), category: category, upi_id: upiId, receiver_name: receiver, round_to: parseInt(roundTo) })
         });
         
         if (!res.ok) alert("❌ Transaction failed. Insufficient funds.");
         else {
-            alert("✅ Payment Successful!");
             document.getElementById('spend-amount').value = '';
             document.getElementById('upi-id').value = '';
             document.getElementById('receiver-name').value = '';
@@ -452,13 +525,12 @@
         const charity = document.getElementById('donate-charity').value;
         if (!amount || amount <= 0) return alert("Enter a valid amount");
 
-        const res = await fetch('https://vortex-4.onrender.com//api/donate', {
+        const res = await fetch('/api/donate', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ amount: parseFloat(amount), charity: charity })
         });
         if (!res.ok) alert("❌ Donation failed. Insufficient funds.");
         else {
-            alert("✅ Thank you for your donation!");
             document.getElementById('donate-amount').value = '';
             toggleForm('donate-form');
             loadState();
@@ -466,9 +538,8 @@
     }
 
     async function redeem() {
-        const res = await fetch('https://vortex-4.onrender.com//api/redeem', { method: 'POST' });
+        const res = await fetch('/api/redeem', { method: 'POST' });
         if (!res.ok) alert("Piggy bank is empty!");
-        else alert("🎉 Transfer successful!");
         closePiggyModal();
         loadState();
     }
